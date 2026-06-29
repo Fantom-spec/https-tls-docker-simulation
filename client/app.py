@@ -13,7 +13,31 @@ except Exception as e:
     print(f"[CLIENT] Connection failed: {e}")
     exit(1)
 
-print("[CLIENT] Connected!")
+print("[CLIENT] Connected")
+
+print("[HANDSHAKE] Sending SYN")
+client.sendall(b"SYN")
+
+response = client.recv(1024).decode().strip()
+
+if response != "SYN-ACK":
+    print(f"[HANDSHAKE] Failed: {response}")
+    client.close()
+    exit(1)
+
+print("[HANDSHAKE] Received SYN-ACK")
+print("[HANDSHAKE] Sending ACK")
+
+client.sendall(b"ACK")
+
+response = client.recv(1024).decode().strip()
+
+if response != "SESSION ESTABLISHED":
+    print(f"[HANDSHAKE] Failed: {response}")
+    client.close()
+    exit(1)
+
+print("[HANDSHAKE] Session Established")
 
 while True:
     command = input("> ").strip()
@@ -27,10 +51,10 @@ while True:
         response = client.recv(1024)
 
         if not response:
-            print("[CLIENT] Server closed the connection.")
+            print("[CLIENT] Server disconnected.")
             break
 
-        print("[SERVER RESPONSE]", response.decode())
+        print("[SERVER]", response.decode())
 
         if command.upper() == "EXIT":
             break
@@ -40,4 +64,5 @@ while True:
         break
 
 client.close()
+
 print("[CLIENT] Connection closed.")
