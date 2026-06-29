@@ -1,0 +1,20 @@
+services:
+  server:
+    build:
+      context: ./server
+    container_name: server
+    networks:
+      - tls-network
+
+  client:
+    build:
+      context: ./client
+    container_name: client
+    depends_on:
+      - server
+    networks:
+      - tls-network
+
+networks:
+  tls-network:
+    driver: bridge
