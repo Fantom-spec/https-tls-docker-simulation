@@ -1,46 +1,43 @@
 import socket
-import json
-import time
 
-HOST = "server"      # Docker service name
+HOST = "server"
 PORT = 5000
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-while True:
-    try:
-        client.connect((HOST, PORT))
-        print(f"Connected to {HOST}:{PORT}")
-        break
-    except ConnectionRefusedError:
-        print("Server not ready. Retrying in 2 seconds...")
-        time.sleep(2)
+print(f"[CLIENT] Connecting to {HOST}:{PORT}...")
+
+try:
+    client.connect((HOST, PORT))
+except Exception as e:
+    print(f"[CLIENT] Connection failed: {e}")
+    exit(1)
+
+print("[CLIENT] Connected!")
 
 while True:
+    command = input("> ").strip()
+
+    if command == "":
+        continue
+
     try:
-        name = input("Enter name: ")
-        message = input("Enter message: ")
-
-        msg = {
-            "name": name,
-            "message": message
-        }
-
-        client.sendall(json.dumps(msg).encode())
+        client.sendall(command.encode())
 
         response = client.recv(1024)
 
         if not response:
-            print("Server disconnected.")
+            print("[CLIENT] Server closed the connection.")
             break
 
-        data = json.loads(response.decode())
+        print("[SERVER RESPONSE]", response.decode())
 
-        print("\nServer Response:")
-        print(json.dumps(data, indent=4))
+        if command.upper() == "EXIT":
+            break
 
-    except KeyboardInterrupt:
-        print("\nClosing client...")
+    except Exception as e:
+        print(f"[CLIENT] Error: {e}")
         break
 
 client.close()
+print("[CLIENT] Connection closed.")
