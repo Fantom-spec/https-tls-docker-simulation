@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
-*.pyo
-*.log
-.env
-.DS_Store
+certs/*.key
+certs/*.csr
+certs/*.srl
+certs/*.ext
+scripts/reset_project.ps1

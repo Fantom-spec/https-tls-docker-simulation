@@ -1,120 +1,137 @@
-# TCP Client-Server Protocol Simulation using Docker
+# HTTPS over TLS Simulation with Python & Wireshark
 
 ## Overview
 
-This project is a hands-on networking lab built to understand how network protocols work from the ground up.
+This project is a hands-on networking lab built to demonstrate how HTTPS works on top of TLS. Instead of relying on a web framework, the project uses Python's standard networking libraries to create a minimal HTTPS client and server, making it easier to observe the underlying protocol behavior.
 
-The current implementation focuses on:
-
-- TCP socket programming
-- Docker container networking
-- Client-server communication
-- Designing a simple application-layer protocol
-
-The goal is to build toward a complete understanding of HTTPS and TLS by implementing each networking concept in small phases instead of relying on existing frameworks.
+The primary goal is to understand the complete lifecycle of a secure connection by analyzing packet captures in Wireshark.
 
 ---
 
-## Current Phase
+## Features
 
-### Phase 1 — TCP Communication
-
-Implemented:
-
-- TCP client
-- TCP server
-- Docker networking
-- Socket communication
-- Multiple client connections
-
----
-
-### Phase 2 — Custom Application Protocol
-
-Implemented protocol commands:
-
-| Command | Description |
-|----------|-------------|
-| `HELLO <name>` | Introduce the client |
-| `MSG <message>` | Send a message |
-| `PING` | Check server availability |
-| `EXIT` | Close the connection |
-
-Example:
-
-```
-HELLO Shubham
-```
-
-Response:
-
-```
-WELCOME Shubham
-```
+* HTTPS server using TLS
+* HTTPS client making secure requests
+* Self-signed Certificate Authority (CA)
+* Server certificate generation with OpenSSL
+* End-to-end encrypted communication
+* Packet capture analysis using Wireshark
 
 ---
 
 ## Project Structure
 
-```
+```text
 .
-├── docker-compose.yaml
-├── client
-│   ├── app.py
-│   ├── Dockerfile
-│   └── requirements.txt
-└── server
-    ├── app.py
-    ├── Dockerfile
-    └── requirements.txt
+├── certs/
+│   ├── ca.crt
+│   ├── server.crt
+│   └── ...
+├── scripts/
+│   ├── generate_certs.ps1
+│   └── reset_project.ps1
+├── screenshots/
+│   ├── tcp_handshake.png
+│   ├── client_hello.png
+│   ├── server_hello.png
+│   ├── certificate.png
+│   └── application_data.png
+├── captures/
+│   └── https_tls_handshake.pcapng
+├── client.py
+├── server.py
+└── README.md
 ```
+
+---
+
+## Technologies
+
+* Python 3
+* OpenSSL
+* HTTPS
+* TLS
+* Wireshark
 
 ---
 
 ## Running the Project
 
-Build the images:
+Generate the certificates:
 
-```bash
-docker compose build
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\generate_certs.ps1
 ```
 
 Start the server:
 
-```bash
-docker compose up server
+```powershell
+python server.py
 ```
 
-Run the client:
+In another terminal, start the client:
 
-```bash
-docker compose run --rm client
+```powershell
+python client.py
 ```
 
 ---
 
-## Learning Roadmap
+## Capturing Traffic
 
-- ✅ Phase 1 – TCP communication
-- ✅ Phase 2 – Custom protocol
-- ⏳ Phase 3 – Handshake simulation
-- ⏳ Phase 4 – Reliability concepts
-- ⏳ Phase 5 – Manual encryption
-- ⏳ Phase 6 – TLS implementation
-- ⏳ Phase 7 – Mutual TLS (mTLS)
-- ⏳ Phase 8 – HTTPS simulation
+1. Open Wireshark.
+2. Start capturing on the appropriate loopback interface.
+3. Apply the filter:
+
+```text
+tcp.port == 8443
+```
+
+Observe the complete HTTPS connection, including:
+
+* TCP Three-Way Handshake
+* TLS Client Hello
+* TLS Server Hello
+* Certificate Exchange
+* Encrypted Application Data
 
 ---
 
-## Technologies Used
+## Sample Capture
 
-- Python 3
-- Docker
-- Docker Compose
-- TCP Sockets
+The repository includes:
+
+* A sample Wireshark capture (`.pcapng`)
+* Screenshots of important protocol stages
+
+These allow the TLS handshake to be explored without running the project.
+
+---
+
+## Learning Objectives
+
+This project demonstrates:
+
+* TCP connection establishment
+* TLS handshake sequence
+* Certificate-based authentication
+* Cipher suite negotiation
+* Encrypted HTTPS communication
+* Packet-level protocol analysis with Wireshark
+
+---
+
+## Future Enhancements
+
+* Mutual TLS (mTLS)
+* TLS 1.2 vs TLS 1.3 comparison
+* Certificate validation improvements
+* TLS session resumption
+* HTTP/2 over TLS
+* TLS key logging for Wireshark decryption
 
 ---
 
 ## Purpose
 
-This repository is intended as a learning project to understand networking and security protocols by implementing them step by step rather than treating them as black boxes.
+The purpose of this repository is educational. It provides a minimal HTTPS implementation that can be inspected with Wireshark to understand how secure web communication is established, authenticated, and encrypted at the protocol level.
